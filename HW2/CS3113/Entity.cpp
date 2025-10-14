@@ -120,7 +120,7 @@ void Entity::checkCollisionX(Entity *collidableEntities, int collisionCheckCount
                 mIsCollidingRight = true;
             } else if (mVelocity.x < 0) {
                 mPosition.x    += xOverlap;
-                mVelocity.x     *= -1;
+                mVelocity.x      *= -1;
  
                 // Collision!
                 mIsCollidingLeft = true;
@@ -192,15 +192,15 @@ void Entity::displayCollider()
     );
 }
 
-void Entity::update(float deltaTime, Entity *collidableEntities, int collisionCheckCount)
+void Entity::update(float deltaTime, Entity *collidableEntities, int collisionCheckCount, Entity *Paddles, int num)
 {
     if(mEntityStatus == INACTIVE) return;
 
     resetColliderFlags();
-
-    mVelocity.x = mMovement.x * mSpeed;
-    mVelocity.y = mMovement.y * mSpeed;
-
+    if (mEntityType == PADDLE){
+        mVelocity.x = mMovement.x * mSpeed;
+        mVelocity.y = mMovement.y * mSpeed;
+    }
     mVelocity.x += mAcceleration.x * deltaTime;
     mVelocity.y += mAcceleration.y * deltaTime;
 
@@ -209,6 +209,7 @@ void Entity::update(float deltaTime, Entity *collidableEntities, int collisionCh
 
     mPosition.x += mVelocity.x * deltaTime;
     checkCollisionX(collidableEntities, collisionCheckCount);
+    checkCollisionX(Paddles, num);
 
     if (mTextureType == ATLAS && GetLength(mMovement) != 0 && mIsCollidingBottom) 
         animate(deltaTime);

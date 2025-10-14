@@ -1,3 +1,13 @@
+/**
+* Author: Aadi Narayan
+* Assignment: Pong Clone
+* Date due: 2025-10-13, 11:59pm
+* I pledge that I have completed this assignment without
+* collaborating with anyone else, in conformance with the
+* NYU School of Engineering Policies and Procedures on
+* Academic Misconduct.
+**/
+
 #include "CS3113/Entity.h"
 
 // Global Constants
@@ -12,12 +22,12 @@ constexpr Vector2 ORIGIN      = { SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 },
 
 constexpr float FIXED_TIMESTEP          = 1.0f / 60.0f;
 
-
+enum NumPlayers {ONE, TWO};
 // Global Variables
 AppStatus gAppStatus   = RUNNING;
 float gPreviousTicks   = 0.0f,
       gTimeAccumulator = 0.0f;
-
+NumPlayers gNumPlayers = TWO;
 int gActivatedBalls = 0;
 
 Entity *gLPad = nullptr;
@@ -41,6 +51,7 @@ void initialise()
     */
     
     gLPad = new Entity({15, ORIGIN.y}, PADDLE_SCALE, "assets/Solid_white.png");
+    gLPad ->setType(PADDLE);
     gLPad ->setColliderDimensions(PADDLE_SCALE);
 
 
@@ -49,6 +60,7 @@ void initialise()
     */
 
     gRPad = new Entity({ORIGIN.x * 2 - 15, ORIGIN.y}, PADDLE_SCALE, "assets/Solid_white.png");
+    gRPad ->setType(PADDLE);
     gRPad ->setColliderDimensions(PADDLE_SCALE);
     
     /*
@@ -101,14 +113,22 @@ void processInput()
     else if (IsKeyDown(KEY_S)) gLPad->moveDown();
 
     gRPad->resetMovement();
-
-    if      (IsKeyDown(KEY_UP)) gRPad->moveUp();
-    else if (IsKeyDown(KEY_DOWN)) gRPad->moveDown();
+    if (gNumPlayers == TWO){
+        if      (IsKeyDown(KEY_UP)) gRPad->moveUp();
+        else if (IsKeyDown(KEY_DOWN)) gRPad->moveDown();
+    }
 
     if (IsKeyPressed(KEY_Q) || WindowShouldClose()) gAppStatus = TERMINATED;
+    if (IsKeyPressed(KEY_P)){ 
+        if (gNumPlayers == ONE){
+            gNumPlayers = TWO;
+        }else {
+            gNumPlayers = ONE;
+        }
+    }
     if (IsKeyPressed(KEY_ONE)) {
         gBalls[0].activate();
-        gBalls[0].setMovement({500, 1000});
+        gBalls[0].setVelocity({50, 100});
         gBalls[1].deactivate();
         gBalls[2].deactivate();
     }
@@ -140,14 +160,19 @@ void update()
         gTimeAccumulator = deltaTime;
         return;
     }
+    if (gNumPlayers == ONE){
+        if (cos(ticks * 2) > 0) gRPad ->moveUp();
+        else gRPad->moveDown();
+    }
+     
 
     while (deltaTime >= FIXED_TIMESTEP)
     {
-        gLPad->update(FIXED_TIMESTEP, gWalls, 2);
+        gLPad->update(FIXED_TIMESTEP, gWalls, 2, nullptr, 0);
 
-        gRPad->update(FIXED_TIMESTEP, gWalls, 2);
+        gRPad->update(FIXED_TIMESTEP, gWalls, 2, nullptr, 0);
 
-        for (int i = 0; i < NUMBER_BALLS; i++) gBalls[i].update(FIXED_TIMESTEP, gWalls, 2);
+        for (int i = 0; i < NUMBER_BALLS; i++) gBalls[i].update(FIXED_TIMESTEP, gWalls, 2, nullptr, 0);
         
         deltaTime -= FIXED_TIMESTEP;
     }

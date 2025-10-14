@@ -70,7 +70,7 @@ public:
         std::map<Direction, std::vector<int>> animationAtlas);
     ~Entity();
 
-    void update(float deltaTime, Entity *collidableEntities, int collisionCheckCount);
+    void update(float deltaTime, Entity *collidableEntities, int collisionCheckCount, Entity *Paddles, int num);
     void render();
     void normaliseMovement() { Normalise(&mMovement); }
 
