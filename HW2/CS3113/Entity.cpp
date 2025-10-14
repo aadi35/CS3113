@@ -61,8 +61,20 @@ void Entity::checkCollisionY(Entity *collidableEntities, int collisionCheckCount
             
             // STEP 3: "Unclip" ourselves from the other entity, and zero our
             //         vertical velocity.
-            if (mVelocity.y > 0) 
-            {
+            if (mEntityType == BALL){
+                if (mVelocity.y > 0) 
+                {
+                    mPosition.y -= yOverlap;
+                    mVelocity.y  *= -1;
+                    mIsCollidingBottom = true;
+                } else if (mVelocity.y < 0) 
+                {
+                    mPosition.y += yOverlap;
+                    mVelocity.y  *= -1;
+                    mIsCollidingTop = true;
+                }
+            }else{
+                if (mVelocity.y > 0){
                 mPosition.y -= yOverlap;
                 mVelocity.y  = 0;
                 mIsCollidingBottom = true;
@@ -71,6 +83,7 @@ void Entity::checkCollisionY(Entity *collidableEntities, int collisionCheckCount
                 mPosition.y += yOverlap;
                 mVelocity.y  = 0;
                 mIsCollidingTop = true;
+            }
             }
         }
     }
@@ -107,7 +120,7 @@ void Entity::checkCollisionX(Entity *collidableEntities, int collisionCheckCount
                 mIsCollidingRight = true;
             } else if (mVelocity.x < 0) {
                 mPosition.x    += xOverlap;
-                mVelocity.x     = 0;
+                mVelocity.x     *= -1;
  
                 // Collision!
                 mIsCollidingLeft = true;
@@ -190,16 +203,6 @@ void Entity::update(float deltaTime, Entity *collidableEntities, int collisionCh
 
     mVelocity.x += mAcceleration.x * deltaTime;
     mVelocity.y += mAcceleration.y * deltaTime;
-
-    // ––––– JUMPING ––––– //
-    if (mIsJumping)
-    {
-        // STEP 1: Immediately return the flag to its original false state
-        mIsJumping = false;
-        
-        // STEP 2: The player now acquires an upward velocity
-        mVelocity.y -= mJumpingPower;
-    }
 
     mPosition.y += mVelocity.y * deltaTime;
     checkCollisionY(collidableEntities, collisionCheckCount);

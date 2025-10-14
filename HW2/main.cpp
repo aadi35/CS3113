@@ -18,6 +18,8 @@ AppStatus gAppStatus   = RUNNING;
 float gPreviousTicks   = 0.0f,
       gTimeAccumulator = 0.0f;
 
+int gActivatedBalls = 0;
+
 Entity *gLPad = nullptr;
 Entity *gRPad = nullptr;
 Entity *gBalls  = nullptr;
@@ -59,6 +61,8 @@ void initialise()
         gBalls[i].setScale({10, 10});
         gBalls[i].setTexture("assets/ball.png");
         gBalls[i].setColliderDimensions({10,10});
+        gBalls[i].deactivate();
+        
     }
     /*
         ----------- Walls -----------
@@ -98,10 +102,27 @@ void processInput()
 
     gRPad->resetMovement();
 
-    if      (IsKeyDown(KEY_Y)) gRPad->moveUp();
-    else if (IsKeyDown(KEY_H)) gRPad->moveDown();
+    if      (IsKeyDown(KEY_UP)) gRPad->moveUp();
+    else if (IsKeyDown(KEY_DOWN)) gRPad->moveDown();
 
     if (IsKeyPressed(KEY_Q) || WindowShouldClose()) gAppStatus = TERMINATED;
+    if (IsKeyPressed(KEY_ONE)) {
+        gBalls[0].activate();
+        gBalls[0].setMovement({500, 1000});
+        gBalls[1].deactivate();
+        gBalls[2].deactivate();
+    }
+    if (IsKeyPressed(KEY_TWO)) {
+        gBalls[0].activate();
+        gBalls[1].activate();
+        gBalls[2].deactivate();
+    }
+    if (IsKeyPressed(KEY_THREE)) {
+        gBalls[0].activate();
+        gBalls[1].activate();
+        gBalls[2].activate();
+    }
+
 }
 
 void update() 
@@ -122,10 +143,11 @@ void update()
 
     while (deltaTime >= FIXED_TIMESTEP)
     {
-        gLPad->update(FIXED_TIMESTEP, gWalls, 4);
+        gLPad->update(FIXED_TIMESTEP, gWalls, 2);
 
-        gRPad->update(FIXED_TIMESTEP, gWalls, 4);
+        gRPad->update(FIXED_TIMESTEP, gWalls, 2);
 
+        for (int i = 0; i < NUMBER_BALLS; i++) gBalls[i].update(FIXED_TIMESTEP, gWalls, 2);
         
         deltaTime -= FIXED_TIMESTEP;
     }

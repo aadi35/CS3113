@@ -5,6 +5,7 @@
 
 enum Direction    { LEFT, UP, RIGHT, DOWN }; // For walking
 enum EntityStatus { ACTIVE, INACTIVE      };
+enum EntityType {WALL, PADDLE, BALL};
 
 class Entity
 {
@@ -41,6 +42,7 @@ private:
     bool mIsCollidingLeft   = false;
 
     EntityStatus mEntityStatus = ACTIVE;
+    EntityType mEntityType = BALL;
 
     bool isColliding(Entity *other) const;
     void checkCollisionY(Entity *collidableEntities, int collisionCheckCount);
@@ -109,8 +111,12 @@ public:
 
     void setPosition(Vector2 newPosition)
         { mPosition = newPosition;                 }
+    void setType(EntityType newType)
+        { mEntityType = newType;                 }
     void setMovement(Vector2 newMovement)
         { mMovement = newMovement;                 }
+    void setVelocity(Vector2 newVelocity)
+        { mVelocity = newVelocity;                 }    
     void setAcceleration(Vector2 newAcceleration)
         { mAcceleration = newAcceleration;         }
     void setScale(Vector2 newScale)
