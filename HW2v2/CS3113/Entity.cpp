@@ -205,11 +205,17 @@ void Entity::update(float deltaTime, Entity *collidableEntities, int collisionCh
     mVelocity.y += mAcceleration.y * deltaTime;
 
     mPosition.y += mVelocity.y * deltaTime;
-    checkCollisionY(collidableEntities, collisionCheckCount);
-
+    if (mPosition.y < 0) {
+        mVelocity.y *= -1;
+        mPosition.y = 0;
+    }else if (mPosition.y > 600){
+        mVelocity.y *= -1;
+        mPosition.y = 600;
+    }
     mPosition.x += mVelocity.x * deltaTime;
     checkCollisionX(collidableEntities, collisionCheckCount);
     checkCollisionX(Paddles, num);
+    
 
     if (mTextureType == ATLAS && GetLength(mMovement) != 0 && mIsCollidingBottom) 
         animate(deltaTime);
