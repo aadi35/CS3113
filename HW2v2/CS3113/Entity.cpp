@@ -125,6 +125,7 @@ void Entity::checkCollisionX(Entity *collidableEntities, int collisionCheckCount
                 // Collision!
                 mIsCollidingLeft = true;
             }
+            mVelocity.y += collidableEntity -> getVelocity().y * 0.2;
         }
     }
 }
