@@ -34,6 +34,7 @@ Entity *gLPad = nullptr;
 Entity *gRPad = nullptr;
 Entity *gBalls  = nullptr;
 Entity *gWalls = nullptr;
+Entity *gGoals = nullptr;
 
 // Function Declarations
 void initialise();
@@ -83,23 +84,24 @@ void initialise()
     gWalls = new Entity[2];
     gWalls[UP].setPosition({0,0});
     gWalls[UP].setScale({SCREEN_WIDTH * 2, 1});
-    gWalls[UP].setColliderDimensions({SCREEN_WIDTH, 1});
+    gWalls[UP].setColliderDimensions({SCREEN_WIDTH*2, 1});
     gWalls[UP].setTexture("assets/Solid_white.png");
 
     gWalls[DOWN].setPosition({0,SCREEN_HEIGHT});
     gWalls[DOWN].setScale({SCREEN_WIDTH * 2, 1});
-    gWalls[DOWN].setColliderDimensions({SCREEN_WIDTH, 1});
+    gWalls[DOWN].setColliderDimensions({SCREEN_WIDTH*2, 1});
     gWalls[DOWN].setTexture("assets/Solid_white.png");
 
-    // gWalls[LEFT].setPosition({0,0});
-    // gWalls[LEFT].setScale({10, SCREEN_HEIGHT * 2});
-    // gWalls[LEFT].setColliderDimensions({10, SCREEN_HEIGHT});
-    // gWalls[LEFT].setTexture("assets/Solid_white.png");
+    gGoals = new Entity[2];
+    gGoals[0].setPosition({0,0});
+    gGoals[0].setScale({10, SCREEN_HEIGHT * 2});
+    gGoals[0].setColliderDimensions({10, SCREEN_HEIGHT*2});
+    gGoals[0].setTexture("assets/Solid_white.png");
 
-    // gWalls[RIGHT].setPosition({0,SCREEN_HEIGHT});
-    // gWalls[RIGHT].setScale({10, SCREEN_HEIGHT * 2});
-    // gWalls[RIGHT].setColliderDimensions({10, SCREEN_HEIGHT});
-    // gWalls[RIGHT].setTexture("assets/Solid_white.png");
+    gGoals[1].setPosition({SCREEN_WIDTH, 100});
+    gGoals[1].setScale({10, SCREEN_HEIGHT * 2});
+    gGoals[1].setColliderDimensions({10, SCREEN_HEIGHT*2});
+    gGoals[1].setTexture("assets/ball.png");
 
 
     SetTargetFPS(FPS);
@@ -128,19 +130,24 @@ void processInput()
     }
     if (IsKeyPressed(KEY_ONE)) {
         gBalls[0].activate();
-        gBalls[0].setVelocity({50, 100});
+        gBalls[0].setVelocity({50, 50});
         gBalls[1].deactivate();
         gBalls[2].deactivate();
     }
     if (IsKeyPressed(KEY_TWO)) {
         gBalls[0].activate();
+        gBalls[0].setVelocity({50, 50});
         gBalls[1].activate();
+        gBalls[1].setVelocity({50, 50});
         gBalls[2].deactivate();
     }
     if (IsKeyPressed(KEY_THREE)) {
         gBalls[0].activate();
+        gBalls[0].setVelocity({50, 50});
         gBalls[1].activate();
+        gBalls[1].setVelocity({50, 50});
         gBalls[2].activate();
+        gBalls[2].setVelocity({50, 50});
     }
 
 }
@@ -172,7 +179,7 @@ void update()
 
         gRPad->update(FIXED_TIMESTEP, gWalls, 2, nullptr, 0);
 
-        for (int i = 0; i < NUMBER_BALLS; i++) gBalls[i].update(FIXED_TIMESTEP, gWalls, 2, nullptr, 0);
+        for (int i = 0; i < NUMBER_BALLS; i++) gBalls[i].update(FIXED_TIMESTEP, gGoals, 2, gWalls, 2);
         
         deltaTime -= FIXED_TIMESTEP;
     }
@@ -187,6 +194,7 @@ void render()
     gRPad->render();
     for (int i = 0; i < NUMBER_BALLS; i++) gBalls[i].render();
     for (int i = 0; i < 2; i++) gWalls[i].render();
+    for (int i = 0; i < 2; i++) gGoals[i].render();
     
 
     EndDrawing();
