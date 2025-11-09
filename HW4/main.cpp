@@ -31,7 +31,7 @@ float gPreviousTicks   = 0.0f,
 Scene *gCurrentScene = nullptr;
 std::vector<Scene*> gLevels = {};
 
-enum SessionState {PLAYING, LOST};
+enum SessionState {PLAYING, LOST, WON};
 
 LevelA *gLevelA = nullptr;
 LevelB *gLevelB = nullptr;
@@ -39,6 +39,7 @@ Start *gStart = nullptr;
 LevelC *gLevelC = nullptr;
 
 Sound hurt;
+Sound win;
 
 SessionState mSessionState = PLAYING;
 
@@ -62,6 +63,7 @@ void initialise()
     InitAudioDevice();
 
     hurt = LoadSound("assets/game/hurt.wav");
+    win = LoadSound("assets/game/power_up.wav");
 
     gLevelA = new LevelA(ORIGIN, "#682b1fff");
     gLevelB = new LevelB(ORIGIN, "#011627ff");
@@ -97,7 +99,7 @@ void processInput()
 
     if (gCurrentScene->getState().protag->getPosition().y == 0.0f && IsKeyDown(KEY_ENTER)) switchToScene(gLevels[1]);
 
-    if (IsKeyPressed(KEY_R) && mSessionState == LOST){
+    if (IsKeyPressed(KEY_R) && mSessionState != PLAYING){
         mSessionState = PLAYING;
         switchToScene(gLevels[0]);
         gLives = 3;
@@ -134,6 +136,10 @@ void update()
             PlaySound(hurt);
         }
 
+        if (gCurrentScene->getState().protag->getPosition().x > gCurrentScene->getOrigin().x + 600 &&
+    gCurrentScene->getState().protag->getPosition().y > gCurrentScene->getOrigin().y - 300){ mSessionState = WON;
+    PlaySound(win);}
+
 
         while (deltaTime >= FIXED_TIMESTEP)
         {
@@ -155,7 +161,13 @@ void render()
 
     EndMode2D();
     DrawText(TextFormat("Lives: %i", gLives), 50, 50, 10, GREEN);
-    if (mSessionState == LOST) DrawText("GAME OVER!!!", 200, 200, 100, RED);
+    if (mSessionState == LOST) {
+        DrawText("GAME OVER!!!\nR - Main Menu", 200, 200, 100, RED);
+    }
+    if (mSessionState == WON){
+        DrawText("YOU WIN!!!\nR - Main Menu", 200, 200, 100, RED);
+        
+    }
     EndDrawing();
 }
 

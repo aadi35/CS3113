@@ -15,6 +15,20 @@ void LevelC::initialise()
 
    mGameState.jumpSound = LoadSound("assets/game/jump.wav");
 
+   std::map<Direction, std::vector<int>> slimeAnimationAtlas = {
+         {DOWN,  {  0,  1,  2,  3,  4,  5,  6,  7, 8}},
+         {LEFT,  {  0,  1,  2,  3,  4,  5,  6,  7, 8}},
+         {UP,    {  0,  1,  2,  3,  4,  5,  6,  7, 8}},
+         {RIGHT, {  0,  1,  2,  3,  4,  5,  6,  7, 8}},
+      };
+
+
+   mGameState.enemy = new Entity({mOrigin.x + 600.0f, mOrigin.y}, {50.0f, 50.0f}, "assets/game/slime_purple.png", ATLAS, {3, 4}, slimeAnimationAtlas, NPC);
+   mGameState.enemy->setAcceleration({0.0f, 0.0f});
+   mGameState.enemy->setAIType(WANDERER);
+   mGameState.enemy->setAIState(WALKING);
+   mGameState.enemy->setSpeed(Entity::DEFAULT_SPEED * 0.3);
+
    /*
       ----------- MAP -----------
    */
@@ -41,7 +55,7 @@ void LevelC::initialise()
 
    // Assets from @see https://sscary.itch.io/the-adventurer-female
    mGameState.protag = new Entity(
-      {mOrigin.x - 750.0f, mOrigin.y - 200.0f}, // position
+      {mOrigin.x - 600.0f, mOrigin.y - 200.0f}, // position
       {200.0f * sizeRatio, 200.0f},             // scale
       "assets/game/walk.png",                   // texture file address
       ATLAS,                                    // single image or atlas?
@@ -79,6 +93,8 @@ void LevelC::update(float deltaTime)
       0               // col. entity count
    );
 
+   mGameState.enemy->update(deltaTime, mGameState.protag, mGameState.map, nullptr, 0);
+
    // CAMERA
    Vector2 currentPlayerPosition = { mGameState.protag->getPosition().x, mOrigin.y };
 
@@ -91,12 +107,14 @@ void LevelC::render()
 
    mGameState.protag->render();
    mGameState.map->render();
+   mGameState.enemy->render();
 }
 
 void LevelC::shutdown()
 {
    delete mGameState.protag;
    delete mGameState.map;
+   delete mGameState.enemy;
 
    UnloadMusicStream(mGameState.bgm);
    UnloadSound(mGameState.jumpSound);
