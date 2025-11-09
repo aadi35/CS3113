@@ -38,6 +38,8 @@ LevelB *gLevelB = nullptr;
 Start *gStart = nullptr;
 LevelC *gLevelC = nullptr;
 
+Sound hurt;
+
 SessionState mSessionState = PLAYING;
 
 // Function Declarations
@@ -58,6 +60,8 @@ void initialise()
 {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Scenes");
     InitAudioDevice();
+
+    hurt = LoadSound("assets/game/hurt.wav");
 
     gLevelA = new LevelA(ORIGIN, "#682b1fff");
     gLevelB = new LevelB(ORIGIN, "#011627ff");
@@ -93,6 +97,12 @@ void processInput()
 
     if (gCurrentScene->getState().protag->getPosition().y == 0.0f && IsKeyDown(KEY_ENTER)) switchToScene(gLevels[1]);
 
+    if (IsKeyPressed(KEY_R) && mSessionState == LOST){
+        mSessionState = PLAYING;
+        switchToScene(gLevels[0]);
+        gLives = 3;
+    }
+
     if (IsKeyPressed(KEY_Q) || WindowShouldClose()) gAppStatus = TERMINATED;
 }
 
@@ -115,11 +125,13 @@ void update()
             gLives -= 1;
             gCurrentScene->shutdown();
             gCurrentScene->initialise();
+            PlaySound(hurt);
         }
         if (gCurrentScene->getState().protag->getPosition().y > 800.0f){
             gLives -= 1;
             gCurrentScene->shutdown();
             gCurrentScene->initialise();
+            PlaySound(hurt);
         }
 
 
