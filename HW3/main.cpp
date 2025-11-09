@@ -30,7 +30,7 @@ AppStatus gAppStatus   = RUNNING;
 GameState gGameState = PLAYING;
 float gPreviousTicks   = 0.0f,
       gTimeAccumulator = 0.0f,
-      gFuel = 10.0f;
+      gFuel = 1.0f;
 
 Entity *gSpaceship = nullptr;
 Entity *gLandingPad = nullptr;
