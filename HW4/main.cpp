@@ -1,5 +1,17 @@
 #include "CS3113/Start.h"
 
+/**
+* Author: Aadi Narayan
+* Assignment: Rise of the AI
+* Date due: 2025-11-08, 11:59pm
+* I pledge that I have completed this assignment without
+* collaborating with anyone else, in conformance with the
+* NYU School of Engineering Policies and Procedures on
+* Academic Misconduct.
+**/
+
+
+
 // Global Constants
 constexpr int SCREEN_WIDTH     = 1000,
               SCREEN_HEIGHT    = 600,
@@ -19,10 +31,14 @@ float gPreviousTicks   = 0.0f,
 Scene *gCurrentScene = nullptr;
 std::vector<Scene*> gLevels = {};
 
+enum SessionState {PLAYING, LOST};
+
 LevelA *gLevelA = nullptr;
 LevelB *gLevelB = nullptr;
 Start *gStart = nullptr;
 LevelC *gLevelC = nullptr;
+
+SessionState mSessionState = PLAYING;
 
 // Function Declarations
 void switchToScene(Scene *scene);
@@ -82,36 +98,39 @@ void processInput()
 
 void update() 
 {
-    float ticks = (float) GetTime();
-    float deltaTime = ticks - gPreviousTicks;
-    gPreviousTicks  = ticks;
+    if (mSessionState == PLAYING){
+        float ticks = (float) GetTime();
+        float deltaTime = ticks - gPreviousTicks;
+        gPreviousTicks  = ticks;
 
-    deltaTime += gTimeAccumulator;
+        deltaTime += gTimeAccumulator;
 
-    if (deltaTime < FIXED_TIMESTEP)
-    {
-        gTimeAccumulator = deltaTime;
-        return;
+        if (deltaTime < FIXED_TIMESTEP)
+        {
+            gTimeAccumulator = deltaTime;
+            return;
+        }
+
+        if (gCurrentScene->getState().protag->isColliding(gCurrentScene->getState().enemy)){
+            gLives -= 1;
+            gCurrentScene->shutdown();
+            gCurrentScene->initialise();
+        }
+        if (gCurrentScene->getState().protag->getPosition().y > 800.0f){
+            gLives -= 1;
+            gCurrentScene->shutdown();
+            gCurrentScene->initialise();
+        }
+
+
+        while (deltaTime >= FIXED_TIMESTEP)
+        {
+            gCurrentScene->update(FIXED_TIMESTEP);
+            deltaTime -= FIXED_TIMESTEP;
+        }
+
+        if (gLives == 0) mSessionState = LOST;
     }
-
-    if (gCurrentScene->getState().protag->isColliding(gCurrentScene->getState().enemy)){
-        gLives -= 1;
-        gCurrentScene->shutdown();
-        gCurrentScene->initialise();
-    }
-    if (gCurrentScene->getState().protag->getPosition().y > 800.0f){
-        gLives -= 1;
-        gCurrentScene->shutdown();
-        gCurrentScene->initialise();
-    }
-
-    while (deltaTime >= FIXED_TIMESTEP)
-    {
-        gCurrentScene->update(FIXED_TIMESTEP);
-        deltaTime -= FIXED_TIMESTEP;
-    }
-
-    //if (gLives == 0) switchToScene();
 }
 
 void render()
@@ -124,6 +143,7 @@ void render()
 
     EndMode2D();
     DrawText(TextFormat("Lives: %i", gLives), 50, 50, 10, GREEN);
+    if (mSessionState == LOST) DrawText("GAME OVER!!!", 200, 200, 100, RED);
     EndDrawing();
 }
 
