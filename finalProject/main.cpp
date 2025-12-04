@@ -20,6 +20,10 @@ float gPreviousTicks   = 0.0f,
 
 ShaderProgram gShader;
 
+float fireTimerOne = 0.0f;
+float fireTimerTwo = 0.0f;
+const float FIRE_COOLDOWN = 2.0f;
+
 Vector2 gLightPosition = {0,0};
 
 Scene *gCurrentScene = nullptr;
@@ -27,6 +31,7 @@ std::vector<Scene*> gLevels = {};
 std::deque<Bullet*> magazine = {};
 
 bool levelThreeFlag = true;
+int shaderOn = 0;
 
 enum PlayerState {MOVING, SHOOTING};
 
@@ -43,6 +48,8 @@ StartScreen *gStartScreen = nullptr;
 Effects *gEffects = new Effects(ORIGIN, SCREEN_WIDTH*100, SCREEN_HEIGHT*100);
 
 Entity *sunglasses = nullptr;
+
+Sound tankMove;
 
 // Function Declarations
 void switchToScene(Scene *scene);
@@ -79,6 +86,8 @@ void initialise()
 
     gShader.load("shaders/vertex.glsl", "shaders/fragment.glsl");
 
+    tankMove = LoadSound("assets/game/tankMove.wav");
+
     for (int i = 0; i < 10; i++){
         Bullet *newBullet = new Bullet({ORIGIN.x - 300, ORIGIN.y}, {25.0f, 25.0f}, "assets/game/Bullet.png");
         newBullet->deactivate();
@@ -102,18 +111,19 @@ void processInput()
         gCurrentScene->getState().playerOne->setAngle(0.0f);
     }
     if (gPlayerOneState == MOVING){
-        if      (IsKeyPressed(KEY_A)) gCurrentScene->getState().playerOne->moveLeft();
-        else if (IsKeyPressed(KEY_D)) gCurrentScene->getState().playerOne->moveRight();
-        if      (IsKeyPressed(KEY_W)) gCurrentScene->getState().playerOne->moveUp();
-        else if (IsKeyPressed(KEY_S)) gCurrentScene->getState().playerOne->moveDown();
+        if      (IsKeyPressed(KEY_A)) {gCurrentScene->getState().playerOne->moveLeft(); PlaySound(tankMove);}
+        else if (IsKeyPressed(KEY_D)) {gCurrentScene->getState().playerOne->moveRight(); PlaySound(tankMove);}
+        if      (IsKeyPressed(KEY_W)) {gCurrentScene->getState().playerOne->moveUp(); PlaySound(tankMove);}
+        else if (IsKeyPressed(KEY_S)) {gCurrentScene->getState().playerOne->moveDown(); PlaySound(tankMove);}
     }else{
         if (IsKeyDown(KEY_A)) gCurrentScene->getState().playerOne->rotateLeft();
         if (IsKeyDown(KEY_D)) gCurrentScene->getState().playerOne->rotateRight();
-        if (IsKeyPressed(KEY_F) && gCurrentScene->getState().playerOne->isActive()){ 
+        if (IsKeyPressed(KEY_F) && gCurrentScene->getState().playerOne->isActive() && fireTimerOne <= 0.0f){ 
             fireBullet(gCurrentScene->getState().playerOne, magazine.front());
             Bullet* temp = magazine.front();
             magazine.pop_front();
             magazine.push_back(temp);
+            fireTimerOne = FIRE_COOLDOWN;
         }
     }
 
@@ -123,18 +133,19 @@ void processInput()
         gCurrentScene->getState().playerTwo->setAngle(0.0f);
     }
     if (gPlayerTwoState == MOVING){
-        if      (IsKeyPressed(KEY_LEFT)) gCurrentScene->getState().playerTwo->moveLeft();
-        else if (IsKeyPressed(KEY_RIGHT)) gCurrentScene->getState().playerTwo->moveRight();
-        if      (IsKeyPressed(KEY_UP)) gCurrentScene->getState().playerTwo->moveUp();
-        else if (IsKeyPressed(KEY_DOWN)) gCurrentScene->getState().playerTwo->moveDown();
+        if      (IsKeyPressed(KEY_LEFT)) {gCurrentScene->getState().playerTwo->moveLeft(); PlaySound(tankMove);}
+        else if (IsKeyPressed(KEY_RIGHT)) {gCurrentScene->getState().playerTwo->moveRight(); PlaySound(tankMove);}
+        if      (IsKeyPressed(KEY_UP)) {gCurrentScene->getState().playerTwo->moveUp(); PlaySound(tankMove);}
+        else if (IsKeyPressed(KEY_DOWN)) {gCurrentScene->getState().playerTwo->moveDown(); PlaySound(tankMove);}
     }else{
         if (IsKeyDown(KEY_LEFT)) gCurrentScene->getState().playerTwo->rotateLeft();
         if (IsKeyDown(KEY_RIGHT)) gCurrentScene->getState().playerTwo->rotateRight();
-        if (IsKeyPressed(KEY_L) && gCurrentScene->getState().playerTwo->isActive()){ 
+        if (IsKeyPressed(KEY_L) && gCurrentScene->getState().playerTwo->isActive() && fireTimerTwo <= 0.0f){ 
             fireBullet(gCurrentScene->getState().playerTwo, magazine.front());
             Bullet* temp = magazine.front();
             magazine.pop_front();
             magazine.push_back(temp);
+            fireTimerTwo = FIRE_COOLDOWN;
         }
     }
 
@@ -160,6 +171,13 @@ void update()
         return;
     }
 
+    if (fireTimerOne > 0.0f) {
+    fireTimerOne -= deltaTime;
+}
+    if (fireTimerTwo > 0.0f) {
+    fireTimerTwo -= deltaTime;
+}
+
     while (deltaTime >= FIXED_TIMESTEP)
     {
         gCurrentScene->update(FIXED_TIMESTEP);
@@ -169,8 +187,8 @@ void update()
                 gCurrentScene->getState().playerOne,
                 gCurrentScene->getState().playerTwo, 
                 gCurrentScene->getState().map, 
-                gCurrentScene->getState().boxes, 
-                20);
+                gCurrentScene->getState().boxes,
+                gCurrentScene->getState().numBoxes);
             }
         gEffects->update(FIXED_TIMESTEP, nullptr);
         if (gCurrScene == 3 && levelThreeFlag){ sunglasses->activate(); levelThreeFlag = false;}
@@ -179,11 +197,13 @@ void update()
         gCurrentScene->getState().map,
         gCurrentScene->getState().playerTwo
         );
-        if (sunglasses->getPlayerNum() == 1){
+        if (sunglasses->collidedWith == gCurrentScene->getState().playerOne){
             gLightPosition = gCurrentScene->getState().playerTwo->getPosition();
+            shaderOn = 1;
         }
-        if (sunglasses->getPlayerNum() == 2){
+        if (sunglasses->collidedWith == gCurrentScene->getState().playerTwo){
             gLightPosition = gCurrentScene->getState().playerOne->getPosition();
+            shaderOn = 1;
         }
     }
     sunglasses->resetMovement();
@@ -195,25 +215,28 @@ void render()
     BeginDrawing();
     BeginMode2D(gCurrentScene->getState().camera);
 
-    if (sunglasses->getPlayerNum() != 0) gShader.begin();
+    gShader.begin();
 
     gCurrentScene->render();
     gShader.setVector2("lightPosition", gLightPosition);
-
-    gShader.end();
-
-    gEffects->render();
-
-    sunglasses->render();
-
+    gShader.setInt("isOn", shaderOn);
     for (Bullet* bullet : magazine) bullet->render();
+    gShader.end();
     for (int x = 0; x <= SCREEN_WIDTH; x += 25) {
         DrawLine(x, 0, x, SCREEN_HEIGHT, Color{ 230, 41, 55, 100 });
     }
     for (int y = 0; y <= SCREEN_HEIGHT; y += 25) {
         DrawLine(0, y, SCREEN_WIDTH, y, Color{ 230, 41, 55, 100 });
     }
+    
+    gEffects->render();
+
+    
+
+    sunglasses->render();
     EndMode2D();
+    DrawText(TextFormat("Player 1: %d", gCurrentScene->getState().playerOne->getLives()), 20, 20, 20, WHITE);
+    DrawText(TextFormat("Player 2: %d", gCurrentScene->getState().playerTwo->getLives()), 800, 20, 20, WHITE);
     EndDrawing();
 }
 

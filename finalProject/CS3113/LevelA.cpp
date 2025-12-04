@@ -107,6 +107,7 @@ void LevelA::initialise()
          mGameState.boxes[i].setEntityType(BLOCK);
 
    }
+   mGameState.numBoxes = 20;
 }
 
 void LevelA::update(float deltaTime)

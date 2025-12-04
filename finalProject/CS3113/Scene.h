@@ -9,6 +9,7 @@ struct GameState
     Entity *playerTwo;
     Map *map;
     Entity* boxes = nullptr;
+    int numBoxes;
 
     Music bgm;
     Sound shotSound;

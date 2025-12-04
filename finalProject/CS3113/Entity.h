@@ -17,7 +17,7 @@ private:
     Vector2 mVelocity;
     Vector2 mAcceleration;
     Sound hurt = LoadSound("assets/game/Hurt.mp3");
-    int playerNum = 0;
+    
 
     Vector2 mScale;
     Vector2 mColliderDimensions;
@@ -82,6 +82,8 @@ public:
     static constexpr int   DEFAULT_FRAME_SPEED   = 14;
     static constexpr float Y_COLLISION_THRESHOLD = 0.5f;
 
+    Entity* collidedWith = nullptr;
+
     Entity();
     Entity(Vector2 position, Vector2 scale, const char *textureFilepath, 
         EntityType entityType);
@@ -131,7 +133,7 @@ public:
     TextureType getTextureType()           const { return mTextureType;           }
     Direction   getDirection()             const { return mDirection;             }
     int         getFrameSpeed()            const { return mFrameSpeed;            }
-    int         getPlayerNum()             const { return playerNum;              }
+    //int         getPlayerNum()             const { return playerNum;              }
     float       getJumpingPower()          const { return mJumpingPower;          }
     bool        isJumping()                const { return mIsJumping;             }
     int         getSpeed()                 const { return mSpeed;                 }
@@ -180,8 +182,8 @@ public:
         { mAIState = newState;                     }
     void setAIType(AIType newType)
         { mAIType = newType;                       }
-    void setPlayerNum(int playerNum)
-        { playerNum = playerNum;                   }
+    // void setPlayerNum(int playerNum)
+    //     { playerNum = playerNum;                   }
 };
 
 #endif // ENTITY_H

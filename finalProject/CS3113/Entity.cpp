@@ -109,7 +109,7 @@ void Entity::checkCollisionX(Entity *collidableEntities, int collisionCheckCount
             }
             if (mEntityType == NPC && collidableEntity->getEntityType()== PLAYER){
                 collidableEntity->loseLife();
-                playerNum = collidableEntity->getPlayerNum();
+                collidedWith = collidableEntity;
                 deactivate();
             }
         }

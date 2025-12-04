@@ -56,7 +56,6 @@ void LevelC::initialise()
       mGameState.playerOne->getScale().y / 3.0f
    });
    mGameState.playerOne->setAcceleration({0.0f, 0.0f});
-   mGameState.playerTwo->setPlayerNum(2);
 
    /*
       ----------- PLAYER2 -----------
@@ -84,7 +83,6 @@ void LevelC::initialise()
       mGameState.playerTwo->getScale().y / 3.0f
    });
    mGameState.playerTwo->setAcceleration({0.0f, 0.0f});
-   mGameState.playerTwo->setPlayerNum(2);
 
    /*
       ----------- CAMERA -----------
@@ -99,7 +97,7 @@ void LevelC::initialise()
    ----------- BOXES -----------
    */
    std::vector<int> used;
-   mGameState.boxes = new Entity[40];
+   mGameState.boxes = new Entity[50];
    for (int i = 0; i < 40; i++){
          int rand = GetRandomValue(0, 836);
          while (std::find(used.begin(), used.end(), rand) != used.end()){
@@ -110,11 +108,18 @@ void LevelC::initialise()
          mGameState.boxes[i].setTexture("assets/game/Box.png");
          mGameState.boxes[i].setEntityType(BLOCK);
    }
-
+   mGameState.numBoxes = 50;
    /*
       ----------- NPC -----------
    */
-   enemyC = new Entity({mOrigin.x - 10, mOrigin.y - 10},{TILE_DIMENSION, TILE_DIMENSION}, "assets/game/Bomb.png", NPC);
+   std::map<Direction, std::vector<int>> bombAnimationAtlas = {
+      {DOWN,  { 0, 1, 2 }},
+      {LEFT,  { 0, 1, 2 }},
+      {UP,    { 0, 1, 2 }},
+      {RIGHT, { 0, 1, 2 }},
+   };
+   enemyC = new Entity({mOrigin.x - 10, mOrigin.y - 10},{TILE_DIMENSION, TILE_DIMENSION}, "assets/game/Bomb.png", 
+      ATLAS, {2, 2}, bombAnimationAtlas, NPC);
    enemyC->setAIType(WANDERER);
    
 }

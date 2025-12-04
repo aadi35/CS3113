@@ -109,10 +109,18 @@ void LevelB::initialise()
          mGameState.boxes[i].setEntityType(BLOCK);
    }
 
+   mGameState.numBoxes = 40;
    /*
       ----------- NPC -----------
    */
-   enemy = new Entity({mOrigin.x - 10, mOrigin.y - 10},{TILE_DIMENSION, TILE_DIMENSION}, "assets/game/Bomb.png", NPC);
+   std::map<Direction, std::vector<int>> bombAnimationAtlas = {
+      {DOWN,  { 0, 1, 2 }},
+      {LEFT,  { 0, 1, 2 }},
+      {UP,    { 0, 1, 2 }},
+      {RIGHT, { 0, 1, 2 }},
+   };
+   enemy = new Entity({mOrigin.x - 10, mOrigin.y - 10},{TILE_DIMENSION, TILE_DIMENSION}, "assets/game/Bomb.png", 
+      ATLAS, {2, 2}, bombAnimationAtlas, NPC);
    enemy->setAIType(WANDERER);
    
 }
