@@ -84,10 +84,10 @@ void processInput()
 {
     gCurrentScene->getState().protag->resetMovement();
 
-    if      (IsKeyDown(KEY_A)) gCurrentScene->getState().protag->moveLeft();
-    else if (IsKeyDown(KEY_D)) gCurrentScene->getState().protag->moveRight();
+    if      (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT)) gCurrentScene->getState().protag->moveLeft();
+    else if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) gCurrentScene->getState().protag->moveRight();
 
-    if (IsKeyPressed(KEY_W) && 
+    if ((IsKeyPressed(KEY_W) || IsKeyDown(KEY_UP)) && 
         gCurrentScene->getState().protag->isCollidingBottom())
     {
         gCurrentScene->getState().protag->jump();

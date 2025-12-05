@@ -1,9 +1,9 @@
 import pygame
 import sys
 
-ROWS = 6   # change grid size here
-COLS = 20
-CELL_SIZE = 60
+ROWS = 24   # change grid size here
+COLS = 40
+CELL_SIZE = 20
 
 pygame.init()
 screen = pygame.display.set_mode((COLS * CELL_SIZE, ROWS * CELL_SIZE))

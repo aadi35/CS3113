@@ -40,7 +40,7 @@ void LevelA::initialise()
 
    // Assets from @see https://sscary.itch.io/the-adventurer-female
    mGameState.playerOne = new Entity(
-      {mOrigin.x - 10, mOrigin.y - 10}, // position
+      {mOrigin.x - 190, mOrigin.y - 10}, // position
       {TILE_DIMENSION, TILE_DIMENSION},             // scale
       "assets/game/Player1.png",                   // texture file address
       ATLAS,                                    // single image or atlas?
@@ -67,7 +67,7 @@ void LevelA::initialise()
 
    // Assets from @see https://sscary.itch.io/the-adventurer-female
    mGameState.playerTwo = new Entity(
-      {mOrigin.x - 10, mOrigin.y - 10}, // position
+      {mOrigin.x + 190, mOrigin.y - 10}, // position
       {TILE_DIMENSION, TILE_DIMENSION},             // scale
       "assets/game/Player2.png",                   // texture file address
       ATLAS,                                    // single image or atlas?

@@ -152,6 +152,7 @@ void processInput()
     if ((gCurrentScene->getState().playerOne->getLives() == 0 || gCurrentScene->getState().playerTwo->getLives() == 0 || gCurrScene == 0) 
     && IsKeyDown(KEY_H)){
         switchToScene(gLevels[++gCurrScene]);
+        if (gCurrScene == 3) gCurrScene = -1;
     }
 
     if (IsKeyPressed(KEY_Q) || WindowShouldClose()) gAppStatus = TERMINATED;
@@ -237,6 +238,8 @@ void render()
     EndMode2D();
     DrawText(TextFormat("Player 1: %d", gCurrentScene->getState().playerOne->getLives()), 20, 20, 20, WHITE);
     DrawText(TextFormat("Player 2: %d", gCurrentScene->getState().playerTwo->getLives()), 800, 20, 20, WHITE);
+    if (gCurrentScene->getState().playerOne->getLives() == 0)  DrawText("Player 2 Wins\n H for next", ORIGIN.x, ORIGIN.y, 100, WHITE);
+    if (gCurrentScene->getState().playerTwo->getLives() == 0)  DrawText("Player 1 Wins\n H for next", ORIGIN.x - 300, ORIGIN.y, 100, WHITE);
     EndDrawing();
 }
 
