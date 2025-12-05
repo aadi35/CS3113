@@ -151,8 +151,9 @@ void processInput()
 
     if ((gCurrentScene->getState().playerOne->getLives() == 0 || gCurrentScene->getState().playerTwo->getLives() == 0 || gCurrScene == 0) 
     && IsKeyDown(KEY_H)){
-        switchToScene(gLevels[++gCurrScene]);
         if (gCurrScene == 3) gCurrScene = -1;
+        switchToScene(gLevels[++gCurrScene]);
+        
     }
 
     if (IsKeyPressed(KEY_Q) || WindowShouldClose()) gAppStatus = TERMINATED;
@@ -219,6 +220,7 @@ void render()
     gShader.begin();
 
     gCurrentScene->render();
+    sunglasses->render();
     gShader.setVector2("lightPosition", gLightPosition);
     gShader.setInt("isOn", shaderOn);
     for (Bullet* bullet : magazine) bullet->render();
@@ -234,7 +236,7 @@ void render()
 
     
 
-    sunglasses->render();
+    
     EndMode2D();
     DrawText(TextFormat("Player 1: %d", gCurrentScene->getState().playerOne->getLives()), 20, 20, 20, WHITE);
     DrawText(TextFormat("Player 2: %d", gCurrentScene->getState().playerTwo->getLives()), 800, 20, 20, WHITE);
